@@ -31,7 +31,40 @@ public class Pawn extends Piece {
 
     @Override
     public List<Move> pseudoLegalMoves(Board board, Position from) {
-        throw new UnsupportedOperationException("M2: implement Pawn.pseudoLegalMoves");
+        List<Move> moves = new ArrayList<>();
+        int direction = color().pawnDirection();
+        Position oneStep = from.offsetOrNull(0, direction);
+        if (oneStep != null && board.isEmpty(oneStep)) {
+            addMove(moves, from, oneStep, null);
+            Position twoSteps = from.offsetOrNull(0, 2 * direction);
+            if (from.rank() == color().pawnStartRank()
+                    && twoSteps != null && board.isEmpty(twoSteps)) {
+                moves.add(Move.quiet(from, twoSteps, this));
+            }
+        }
+        for (int fileDelta : new int[] {-1, 1}) {
+            Position to = from.offsetOrNull(fileDelta, direction);
+            if (to != null) {
+                Piece occupant = board.pieceAt(to);
+                if (occupant != null && occupant.color() != color()) {
+                    addMove(moves, from, to, occupant);
+                }
+            }
+        }
+        return moves;
+    }
+
+    /** Reaching the promotion rank expands a destination into four choices. */
+    private void addMove(List<Move> moves, Position from, Position to, Piece captured) {
+        if (to.rank() == color().promotionRank()) {
+            for (PieceType choice : PROMOTION_CHOICES) {
+                moves.add(Move.promotion(from, to, this, captured, choice));
+            }
+        } else if (captured == null) {
+            moves.add(Move.quiet(from, to, this));
+        } else {
+            moves.add(Move.capture(from, to, this, captured));
+        }
     }
 
     /**
@@ -47,6 +80,7 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean attacks(Board board, Position from, Position target) {
-        throw new UnsupportedOperationException("M2: implement Pawn.attacks");
+        return target.rank() - from.rank() == color().pawnDirection()
+                && Math.abs(target.file() - from.file()) == 1;
     }
 }
