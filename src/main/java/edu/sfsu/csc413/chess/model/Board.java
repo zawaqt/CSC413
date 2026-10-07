@@ -28,6 +28,33 @@ public class Board {
         squares[position.file()][position.rank()] = piece;
     }
 
+    /** Apply a trusted move without checking its legality. */
+    public void apply(Move move) {
+        Piece destination = move.isPromotion()
+                ? createPromoted(move.promotesTo(), move.moved().color())
+                : move.moved();
+        place(move.from(), null);
+        place(move.to(), destination);
+    }
+
+    /** Restore both the original mover and the captured piece, if any. */
+    public void undo(Move move) {
+        place(move.from(), move.moved());
+        place(move.to(), move.captured());
+    }
+
+    /* Keep model independent of factory. This duplicates the four promotion
+       constructors in PieceFactory, so changes must be kept in sync there. */
+    private Piece createPromoted(PieceType type, Color color) {
+        return switch (type) {
+            case QUEEN -> new Queen(color);
+            case ROOK -> new Rook(color);
+            case BISHOP -> new Bishop(color);
+            case KNIGHT -> new Knight(color);
+            default -> throw new IllegalArgumentException("Invalid promotion type: " + type);
+        };
+    }
+
     /** Return every position occupied by a piece of {@code color}. */
     public List<Position> positionsOf(Color color) {
         List<Position> positions = new ArrayList<>();
