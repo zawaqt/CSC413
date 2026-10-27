@@ -191,7 +191,7 @@ sequenceDiagram
     end
     loop each candidate move
         Generator->>Board: apply(move)
-        Note over Board: Clear from; place mover or promoted piece on to
+        Note over Board: Clear source, place mover or promoted piece at destination
         Generator->>Generator: isInCheck(board, color)
         Generator->>Board: kingPosition(color)
         Board-->>Generator: king square or null
@@ -217,6 +217,6 @@ sequenceDiagram
         Generator->>Board: undo(move) in finally
         Note over Board: Restore original mover and captured occupant
     end
-    Generator-->>Game: legal moves; board restored
+    Generator-->>Game: legal moves, board restored
     Game-->>Caller: legal moves
 ```
