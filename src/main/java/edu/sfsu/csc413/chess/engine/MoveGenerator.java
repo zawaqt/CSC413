@@ -35,13 +35,38 @@ public final class MoveGenerator {
     /**
      * Every move {@code color} may legally play in the given position.
      *
-     * <p>At M4 this is {@link #pseudoLegalMoves} unfiltered: the right colour
-     * and the right geometry. M5 adds the one global rule, king safety, here
-     * and only here. {@code Game.legalMoves()} calls this and does not change
-     * when it tightens.
+     * <p>Try each pseudo-legal move and retain it only if this side's king is
+     * safe afterward. Every trial restores the caller's board before continuing.
      */
     public static List<Move> legalMoves(Board board, Color color) {
-        return pseudoLegalMoves(board, color);
+        List<Move> legal = new ArrayList<>();
+        for (Move move : pseudoLegalMoves(board, color)) {
+            board.apply(move);
+            try {
+                if (!isInCheck(board, color)) {
+                    legal.add(move);
+                }
+            } finally {
+                board.undo(move);
+            }
+        }
+        return legal;
+    }
+
+    /** True if this side's king is attacked; a side without a king is not in check. */
+    public static boolean isInCheck(Board board, Color color) {
+        Position king = board.kingPosition(color);
+        return king != null && isAttacked(board, king, color.opposite());
+    }
+
+    /** True if any piece of the attacking color attacks the target square. */
+    public static boolean isAttacked(Board board, Position target, Color attacker) {
+        for (Position from : board.positionsOf(attacker)) {
+            if (board.pieceAt(from).attacks(board, from, target)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

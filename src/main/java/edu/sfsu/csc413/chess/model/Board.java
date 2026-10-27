@@ -69,6 +69,16 @@ public class Board {
         return positions;
     }
 
+    /** Return this color's king square, or null in a position without its king. */
+    public Position kingPosition(Color color) {
+        for (Position position : positionsOf(color)) {
+            if (pieceAt(position).type() == PieceType.KING) {
+                return position;
+            }
+        }
+        return null;
+    }
+
     /** Return the board's FEN placement field, with rank 8 first. */
     @Override
     public String toString() {
