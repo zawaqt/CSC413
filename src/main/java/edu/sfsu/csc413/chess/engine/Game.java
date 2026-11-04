@@ -74,6 +74,16 @@ public class Game {
         return MoveGenerator.legalMoves(board, sideToMove);
     }
 
+    /** Return this game's status for the current side to move. */
+    public GameStatus status() {
+        return MoveGenerator.status(board, sideToMove);
+    }
+
+    /** True when the current status is checkmate or stalemate. */
+    public boolean isGameOver() {
+        return status().isGameOver();
+    }
+
     /**
      * Finds the legal move matching notation such as {@code "e2e4"} or
      * {@code "e7e8q"}, if there is one.

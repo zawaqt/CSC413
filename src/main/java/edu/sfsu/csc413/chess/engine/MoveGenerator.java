@@ -53,6 +53,15 @@ public final class MoveGenerator {
         return legal;
     }
 
+    /** Describe check and whether the side to move has any legal reply. */
+    public static GameStatus status(Board board, Color sideToMove) {
+        boolean inCheck = isInCheck(board, sideToMove);
+        if (legalMoves(board, sideToMove).isEmpty()) {
+            return inCheck ? GameStatus.CHECKMATE : GameStatus.STALEMATE;
+        }
+        return inCheck ? GameStatus.CHECK : GameStatus.IN_PROGRESS;
+    }
+
     /** True if this side's king is attacked; a side without a king is not in check. */
     public static boolean isInCheck(Board board, Color color) {
         Position king = board.kingPosition(color);
