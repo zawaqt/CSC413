@@ -57,6 +57,7 @@ public final class SwingView implements BoardView {
             this.message = message;
             if (messageLabel != null) {
                 messageLabel.setText(message);
+                messageLabel.setToolTipText(message);
             }
         });
     }
@@ -108,9 +109,12 @@ public final class SwingView implements BoardView {
             JPanel controls = new JPanel();
             JButton undo = new JButton("Undo");
             undo.addActionListener(event -> request(new PlayerAction.Undo()));
+            JButton legalMoves = new JButton("Legal moves");
+            legalMoves.addActionListener(event -> request(new PlayerAction.ShowMoves()));
             JButton quit = new JButton("Quit");
             quit.addActionListener(event -> quit());
             controls.add(undo);
+            controls.add(legalMoves);
             controls.add(quit);
             frame.add(labels, BorderLayout.NORTH);
             frame.add(coordinates, BorderLayout.CENTER);
@@ -182,6 +186,7 @@ public final class SwingView implements BoardView {
         }
         statusLabel.setText(game.sideToMove() + " to move | " + game.status());
         messageLabel.setText(message);
+        messageLabel.setToolTipText(message);
     }
 
     @Override
